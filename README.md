@@ -56,3 +56,8 @@ This is not at odds with being stateless because the server isn't remembering wh
 · Another for user authentication and registration
 
 . The client shouldn't care about how the backend is organised!
+
+### To Run you server use uvicon
+```bash
+$ uvicorn main:app
+```
