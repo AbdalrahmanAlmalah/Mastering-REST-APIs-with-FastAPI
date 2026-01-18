@@ -1,13 +1,16 @@
-from fastapi import APIRouter
-from models.post import UserPost, UserPostIn
+from fastapi import APIRouter, HTTPException
+from models.post import Comment, CommentIn, UserPost, UserPostIn
 
 router = APIRouter()
-
-
 post_tabel = {}
+comment_table = {}
 
 
-@router.post("/", response_model=UserPost)
+def find_post(post_id: int):
+    return post_tabel.get(post_id)
+
+
+@router.post("/post", response_model=UserPost)
 async def create_post(post: UserPostIn):
     data = post.dict()
     last_record_id = len(post_tabel)
@@ -16,6 +19,23 @@ async def create_post(post: UserPostIn):
     return new_post
 
 
-@router.get("/", response_model=list[UserPost])
+@router.get("/post", response_model=list[UserPost])
 async def get_posts():
     return list(post_tabel.values())
+
+
+@router.post("/commnet", response_model=Comment)
+async def create_comment(comment: CommentIn):
+    post = find_post(comment.post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not Found")
+    data = comment.dict()
+    last_record_id = len(comment_table)
+    new_comment = {**data, "id": last_record_id}
+    comment_table[last_record_id] = new_comment
+    return new_comment
+
+
+@router.get("/commnet", response_model=list[UserPost])
+async def get_comment():
+    return list(comment_table.values())
